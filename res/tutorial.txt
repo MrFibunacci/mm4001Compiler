@@ -1,0 +1,102 @@
+0000 	00 	00
+OPC		E1	E2
+
+00:		A		Akkumulator
+01		D		Datenregister
+10		PL		Pointer-Low
+11		PH		Pointer-High
+
+0000	0000
+PH		PL
+
+spezial:
+Flagregister
+ProgramCounter
+Stackpointer
+
+0000:	NOP
+0001:	MOV
+0010:	INA
+0011:	STO
+    E1
+    01 => Autoinkrement Pointer
+    10 => Autodekrement Pointer
+    E2
+    Quellregister
+
+0100:	LOD
+    E1
+    Zielregister
+    E2
+    01 => Autoinkrement Pointer
+    10 => Autodekrement Pointer
+
+0101:	(ALU)
+0110:	(Jump-if-true)
+0111:	(Jump-if-false)
+1000:	PUSH
+1001:	POP
+1010:	TAK
+1011:	PRN
+1100:	CLS
+1101:	HLT
+1110:	TRP
+1111:	RES
+
+NOP		Leertakt
+MOV		Register untereinander verschieben
+INA		4 Bit direktwert in den Akku laden
+STO		In speicher laden
+LOD		Aus speicher laden
+
+(ALU):	
+
+Verrechnet Akkumulator mit DatenRegister
+
+E1E2
+0000	ADD
+0001	SUB
+0010	INC
+0011	DEC
+0100	CMP
+0101	NOT
+0110	AND
+0111	NAND
+1000	OR
+1001	NOR
+1010	XOR
+1011	XNOR
+1100	SHL
+1101	SHR
+1110	ROL
+1111	ROR
+
+(Jump-if-True):
+
+Flagregister Auflistung:
+
+0	0	0	0
+B	C	G	E
+
+E1E2
+XXXX <- so setzen, dass sie die Flags "treffen". Jump if Zero Flag is set -->
+*		wäre dann 0110 0001	(jump-if-true: Zero)
+
+(Jump-if-False):
+
+E1E2
+XXXX <- so setzen, dass sie die Flags "treffen". Jump if Zero Flag is not set -->
+*		wäre dann 0111 0001	(jump-if-false: Zero)
+
+PUSH	Schiebt Wert auf den Stack,inkrementiert stackpointer
+POP		Läd wert von Stack, dekrementiert Stackpointer
+TAK		Kopiere Wert am keyboardbuffer
+PRN		Gebe Register aus (ASCII)
+
+E1E2	
+HHLL	--> obere 8 bits und untere 8 bits
+
+CLS		Leere bildschirm und buffer
+HLT		Stoppe die CPU
+TRP		Setze einzelschrittmodus (Manuell takten)
+RES		Setze CPU zurück

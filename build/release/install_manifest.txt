@@ -1,0 +1,1 @@
+/home/fibu/Projects/mm4001Compiler/dist/release/bin/mm4001-compiler

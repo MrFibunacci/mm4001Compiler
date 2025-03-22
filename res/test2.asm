@@ -1,0 +1,4 @@
+INA 12
+INA 14
+INA 0xF
+MOV PH,D
