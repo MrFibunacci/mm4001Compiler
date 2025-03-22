@@ -1,1 +1,0 @@
-/usr/bin/c++ -O3 -DNDEBUG -rdynamic "CMakeFiles/mm4001-compiler.dir/main.cpp.o" -o mm4001-compiler 

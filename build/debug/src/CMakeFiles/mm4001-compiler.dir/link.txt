@@ -1,1 +1,0 @@
-/usr/bin/c++ -g -rdynamic "CMakeFiles/mm4001-compiler.dir/main.cpp.o" -o mm4001-compiler 
