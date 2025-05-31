@@ -5,8 +5,9 @@
 #include <vector>
 #include <array>
 #include <algorithm>
+#include <cstdint>
 
-typedef u_int8_t byte;
+typedef uint8_t byte;
 
 enum Reg
 {
@@ -113,13 +114,13 @@ constexpr std::array<std::string_view, 4> RegNames = {
 };
 
 // split string by delimiter
-std::vector<std::string> split(std::string s, std::string delimiter) {
-    size_t pos_start = 0, pos_end, delim_len = delimiter.length();
-    std::string token;
-    std::vector<std::string> res;
+std::vector<std::string> split(const std::string& s, const std::string& delimiter) {
+	size_t pos_start = 0, pos_end;
+	const size_t delim_len = delimiter.length();
+	std::vector<std::string> res;
 
     while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
-        token = s.substr (pos_start, pos_end - pos_start);
+        std::string token = s.substr(pos_start, pos_end - pos_start);
         pos_start = pos_end + delim_len;
         res.push_back (token);
     }
@@ -142,7 +143,7 @@ std::ifstream openFile(const char* filePath)
 }
 
 //Reads string number and returns as integer
-int readNumber(std::string s)
+int readNumber(const std::string &s)
 {
 	auto base = 10;
 	//check if string starts with "0x" then use hexadecimal
@@ -152,14 +153,14 @@ int readNumber(std::string s)
 	return std::stoi(s, nullptr, base);
 }
 
-bool isValInArray(std::array<std::string_view, 4> arr, std::string _val)
+bool isValInArray(std::array<std::string_view, 4> arr, const std::string &_val)
 {
-	std::string_view *foo = std::find(arr.begin(), arr.end(), _val);
+	const std::string_view *foo = std::find(arr.begin(), arr.end(), _val);
 
 	return (foo != std::end(arr));
 }
 
-int getIDOfElement(std::array<std::string_view, 4> arr, std::string _val)
+int getIDOfElement(const std::array<std::string_view, 4> &arr, const std::string &_val)
 {
 	return (std::find(arr.begin(), arr.end(), _val)) - arr.begin();
 }
@@ -198,7 +199,7 @@ int main(int argc, const char* argv[])
 			break;
 
 		case Opcodes::MOV: {
-			// get arguemts
+			// get arguments
 			std::vector<std::string> regs = split(s[1], ",");
 
 			if (!isValInArray(RegNames, regs[1])) {
@@ -230,7 +231,7 @@ int main(int argc, const char* argv[])
 		} break;
 		
 		default:
-			std::cout << "ERROR: unkown OPC -> " << OpcNames[opc] << std::endl;
+			std::cout << "ERROR: unknown OPC -> " << OpcNames[opc] << std::endl;
 			exit(1);
 			break;
 		}
