@@ -1,11 +1,11 @@
 INA 12
-MOV DX,AX
+MOV D,A
 RES
 NOP
-STO AutoInc
-STO AutoDec
-LOD AutoDec
-LOD AutoInc
-ALU ADD
-JIT C
+STO A
+STO D AutoDec
+LOD D AutoDec
+LOD PL AutoInc
+ALU ROL
+JIT B
 JIF G

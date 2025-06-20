@@ -20,12 +20,11 @@ enum Reg
 	SP,		// Stackpointer
 };
 
-enum Flags
-{
-	B = 1 << 3,	// borrow (overflow on subtraction)
-	C = 1 << 2,	// carry (overflow on addition)
-	G = 1 << 1,	// greater (on cmp)
-	E = 1 << 0  // equal (on cmp)
+constexpr std::array<std::string_view, 4> FlagNames = {
+	"B",
+	"C",
+	"G",
+	"E"
 };
 
 enum Opcodes
@@ -165,6 +164,15 @@ int getIDOfElement(const std::array<std::string_view, 4> &arr, const std::string
 	return (std::find(arr.begin(), arr.end(), _val)) - arr.begin();
 }
 
+template <typename Iter>
+size_t index_of(Iter first, Iter last, const typename std::iterator_traits<Iter>::value_type& x)
+{
+	size_t i = 0;
+	while (first != last && *first != x)
+		++first, ++i;
+	return i;
+}
+
 int main(int argc, const char* argv[])
 {
 	if (argc <= 1)
@@ -219,28 +227,78 @@ int main(int argc, const char* argv[])
 		} break;
 
 		case Opcodes::INA: {
-			// cast text number to binary 
-			int immediate = readNumber(s[1]);
+			// cast text number to binary
 			// check if argument is valid number
-			if (immediate >= 1 << 4) {
+			if (int immediate = readNumber(s[1]); immediate >= 1 << 4) {
 				std::cout << "ERROR: immediate value to large in Line: " << line << std::endl;
 			} else {
 				// combine number and opc and push to variable
 				writeToBinary.push_back(opc << 4 | immediate);
 			}
 		} break;
+
+		case STO: {
+			byte autoInc;
+			if (s[2] == "AutoInc") {
+				autoInc = 1;
+			} else if (s[2] == "AutoDec") {
+				autoInc = 2;
+			} else {
+				autoInc = 0;
+			}
+
+			writeToBinary.push_back(opc << 4 | autoInc << 2 | getIDOfElement(RegNames, s[1]));
+		} break;
+
+		case LOD: {
+			byte autoInc;
+			if (s[2] == "AutoInc") {
+				autoInc = 1;
+			} else if (s[2] == "AutoDec") {
+				autoInc = 2;
+			} else if (s.size() == 2) {
+				autoInc = 0;
+			} else {
+				std::cout << "ERROR: Unknown operand in Line: " << line << std::endl;
+			}
+
+			writeToBinary.push_back(opc << 4 | getIDOfElement(RegNames, s[1]) << 2 | autoInc);
+		} break;
+
+		case ALU: {
+			size_t aluInst = index_of(ALUOpcNames.begin(), ALUOpcNames.end(), s[1]);
+
+			writeToBinary.push_back(opc << 4 | aluInst);
+		} break;
+
+		case JIF:
+		case JIT: {
+			byte flagNibble = 0;
+
+			if (s[1] == "B")		// borrow (overflow on subtraction)
+				flagNibble = 1 << 3;
+			else if (s[1] == "C")	// carry (overflow on addition)
+				flagNibble = 1 << 2;
+			else if (s[1] == "G")	// greater (on cmp)
+				flagNibble =  1 << 1;
+			else if (s[1] == "E")	// equal (on cmp)
+				flagNibble = 1 << 0;
+			else
+				std::cout << "ERROR: Unknown Flag in Line: " << line << std::endl;
+
+			writeToBinary.push_back(opc << 4 | flagNibble);
+		} break;
 		
 		default:
 			std::cout << "ERROR: unknown OPC -> " << OpcNames[opc] << std::endl;
 			exit(1);
-			break;
 		}
 
 		std::cout << "Opcode: " << OpcNames[opc] << std::endl;
 		//for(int i = 0; i < s.size(); i++) { printf("%s\n", s[i].c_str()); }
 	}
 
-	binFile.write(writeToBinary.data(), sizeof writeToBinary);
+	binFile.write(writeToBinary.data(), writeToBinary.size());
 	
 	asmFile.close();
 	binFile.close();
