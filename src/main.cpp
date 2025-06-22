@@ -190,6 +190,10 @@ int main(int argc, const char* argv[])
 
 	while (std::getline(asmFile, line)) 
 	{
+		// skip comments and empty lines
+		if (line.empty() || line.find(';') != std::string::npos)
+			continue;
+
 		std::vector<std::string> s = split(line, " ");
 
 		// get the opcode to save in binary file
